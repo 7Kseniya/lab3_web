@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+
+      <h:head>
+        <title>main page</title>
+        <script type="text/javascript" charset="UTF-8"
+        src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <h:outputScript library = "js" name="graph.js"/>
+        <h:outputScript library = "js" name="validation.js"/>
+        <h:outputScript library = "js" name="script.js"/>
+
+        <!-- <h:outputScript library = "js" name = "canvas.js" /> -->
+        <!-- <script type = "text/javascript" src="resources/js/graph.js"></script>
+        <script type = "text/javascript" src="resources/js/script.js"></script>
+        <script type = "text/javascript" src="resources/js/validation.js"></script>  -->
+
+    </h:head>
+      <h:body>
+        <div>
+            <header>
+                <span>Ignatyeva Kseniya P3225 var 861303</span>
+                <h:button value="to starter page" outcome="toIndex" styleClass="start-button"/>
+            </header>
+        </div>
+        <div>
+            <p:clock pattern="HH:mm:ss dd.MM.yyyy" mode="server" autoSync="true" syncInterval="9000"/>
+        </div>
+
+        <div class="left-data">
+            <div id="jxgbox" class="jxgbox"></div>
+            
+
+            <h:form method = "post" id = "form">
+                <fieldset>
+                    <legend> hit check</legend>
+                    <div class="form-field">
+                        <span>choose x:</span>
+                        <h:inputHidden id="x_value" value="#{pointBean.x}"/>
+                        <h:selectOneMenu id="selector" required="true">
+                            <f:selectItem itemValue="-2" itemLabel="-2"/>
+                            <f:selectItem itemValue="-1.5" itemLabel="-1.5"/>
+                            <f:selectItem itemValue="-1" itemLabel="-1"/>
+                            <f:selectItem itemValue="-0.5" itemLabel="-0.5"/>
+                            <f:selectItem itemValue="0" itemLabel="0"/>
+                            <f:selectItem itemValue="0.5" itemLabel="0.5"/>
+                            <f:selectItem itemValue="1" itemLabel="1"/>
+                            <f:selectItem itemValue="1.5" itemLabel="1.5"/>
+                        </h:selectOneMenu>
+                        <div>
+                            <small></small>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <span>Enter Y:</span>
+                        <h:inputText value="#{pointBean.y}" id="y_value" required="true">
+                            <f:validateDoubleRange minimum="-5" maximum="3"/>
+                        </h:inputText>
+                        <div>
+                            <small></small>
+                        </div>
+                    </div>
+
+                    <div class="r_buttons">
+                        <span>Choose R:</span>
+                        <h:commandButton type="button" value="1"/>
+                        <h:commandButton type="button" value="1.5"/>
+                        <h:commandButton type="button" value="2"/>
+                        <h:commandButton type="button" value="2.5"/>
+                        <h:commandButton type="button" value="3"/>
+                        <h:inputHidden id="r_value" value="#{pointBean.r}"/>
+                        <div>
+                            <small></small>
+                        </div>
+                    </div>
+
+                    <h:inputHidden id="timezone" value="${pointBean.timezone}"/>
+
+                    <div class="submit_buttons">
+                        <h:commandButton value="submit" action="#{pointBean.processRequest()}" type="submit"
+                                        onclick="set_timezone()">
+                            <f:ajax execute="x_value y_value r_value timezone" render="table script"/>
+                        </h:commandButton>
+                        <h:commandButton value="clear" action="#{listContainer.remove()}" type="button">
+                            <f:ajax render="table script"/>
+                        </h:commandButton>
+                    </div>
+
+                    <h:panelGroup id="script">
+                        <h:outputScript>
+                            function updatePoints() {
+                            clearPoints();
+                            serverPoints = [
+                            <ui:repeat value="#{listContainer.list}" var="point">
+                                {x: #{point.x}, y: #{point.y}, r: #{point.r}, hit: #{point.hit}},
+                            </ui:repeat>
+                            ];
+                            drawPointsByR($('.r_buttons input.pressed').val());
+                            }
+                            updatePoints();
+                        </h:outputScript>
+                    </h:panelGroup>
+                </fieldset>
+            </h:form>
+        </div>
+
+        <div class="right-data">
+            <h:dataTable styleClass="result_table" value="#{listContainer.list}" var="entry" id="table">
+                <h:column>
+                    <f:facet name="header">x</f:facet>
+                    <h:outputText value="#{entry.x}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">y</f:facet>
+                    <h:outputText value="#{entry.y}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">r</f:facet>
+                    <h:outputText value="#{entry.r}"/>
+                </h:column>
+                <!-- <h:column>
+                    <f:facet name="header">Local time</f:facet>
+                    <h:outputText value="#{entry.currentTime}"/>
+                </h:column> -->
+                <h:column>
+                    <f:facet name="header">Hit</f:facet>
+                    <h:outputText value="#{entry.hit}"/>
+                </h:column>
+                
+                <h:column>
+                    <f:facet name="header">Script working time</f:facet>
+                    <h:outputText value="#{entry.executionTime}"/>
+                </h:column>
+            </h:dataTable>
+        </div>
+        </h:body>
+</html>
